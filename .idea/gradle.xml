@@ -11,6 +11,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/GeneradorExpedienteCSV" />
             <option value="$PROJECT_DIR$/GeneradorExpedienteJSON" />
+            <option value="$PROJECT_DIR$/NotasMiddleware" />
+            <option value="$PROJECT_DIR$/Visualizer" />
           </set>
         </option>
       </GradleProjectSettings>

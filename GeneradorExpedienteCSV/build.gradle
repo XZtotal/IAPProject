@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
     implementation 'org.json:json:20231013'
     implementation 'com.rabbitmq:amqp-client:5.13.0'
     implementation files('libs/centroDocenteDAO.jar')
@@ -31,4 +32,12 @@ jar {
 shadowJar {
     archiveBaseName = 'GeneradorExpedienteCSV'
     archiveVersion = '1.0.0'
+    manifest {
+        attributes 'Main-Class': 'iap.group1.GeneradorExpedienteCSV'
+    }
+}
+
+tasks.register('run', JavaExec) {
+    mainClass = 'iap.group1.Main'
+    classpath = sourceSets.main.runtimeClasspath
 }

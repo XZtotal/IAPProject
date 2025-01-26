@@ -2,4 +2,6 @@ rootProject.name = 'IAPProject'
 include 'GeneradorExpedienteCSV', 'GeneradorExpedienteJSON'
 include 'GeneradorExpedienteCSV'
 include 'GeneradorExpedienteJSON'
+include 'NotasMiddleware'
+include 'Visualizer'
 
