@@ -36,7 +36,7 @@ public class GeneradorExpedienteCSV {
 
             String message;
             do {
-                System.out.print("Enter the student's DNI number or write exit to finish the program:");
+                System.out.print("Enter the student's DNI number or write 'exit' to finish:");
                 message = scanner.nextLine();
                 if (!message.equalsIgnoreCase("exit")) {
                     processStudentData(channel, scanner, message);
@@ -68,7 +68,7 @@ public class GeneradorExpedienteCSV {
     private static void processStudentData(Channel channel, Scanner scanner, String dni) throws IOException {
         System.out.print("Enter year: ");
         int year = Integer.parseInt(scanner.nextLine());
-        File csvFile = new File("Expediente_" + dni + ".csv");
+        File csvFile = new File("generadores" + File.separator + "Expediente_" + dni + ".csv");
         //Genera un archivo del expediente del alumno en formato CSV
         try (FileWriter writer = new FileWriter(csvFile)) {
             String studentData = fetchStudentData(dni, year);

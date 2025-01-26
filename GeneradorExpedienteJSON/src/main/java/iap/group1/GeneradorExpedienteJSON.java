@@ -28,7 +28,7 @@ import domain.AlumnoAsignatura;
 
 public class GeneradorExpedienteJSON {
     private static final String RABBITMQ_BROKER = "localhost";
-    private static final String NOMBRE_EXCHANGE = "primer_exchange";
+    private static final String NOMBRE_EXCHANGE = "primer-exchange";
     private static final String TOPIC = "generador.json";
 
     public static void main(String[] args) throws IOException, TimeoutException, JSONException {
@@ -67,7 +67,7 @@ public class GeneradorExpedienteJSON {
     }
 
     private static void declareExchange(Channel channel, String id) throws IOException {
-        channel.exchangeDeclare(NOMBRE_EXCHANGE, BuiltinExchangeType.TOPIC, false, true, null);
+        channel.exchangeDeclare(NOMBRE_EXCHANGE, BuiltinExchangeType.TOPIC);
         System.out.println("[" + id + "] Declared a EXCHANGE called " + NOMBRE_EXCHANGE + " of type TOPIC");
     }
 

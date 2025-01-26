@@ -4,22 +4,24 @@ import com.rabbitmq.client.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
+import static iap.group1.NotasMiddleware.*;
+
 public class JSONConsumer implements Runnable{
 
-    private static final String SOURCE_EXCHANGE = "primer-exchange";
-    private static final String SOURCE_TOPIC = "generador.json";
-    private static final String DESTINATION_EXCHANGE = "notas.alumnos.anyo";
+
 
     public void run() {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
-        factory.setPort(5672);
-        factory.setUsername("guest");
-        factory.setPassword("guest");
+        factory.setHost(HOST);
+        factory.setPort(PORT);
+        factory.setUsername(USERNAME);
+        factory.setPassword(PASSWORD);
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
 
@@ -27,7 +29,7 @@ public class JSONConsumer implements Runnable{
             channel.exchangeDeclare(DESTINATION_EXCHANGE, BuiltinExchangeType.FANOUT);
 
             String queueName = channel.queueDeclare().getQueue();
-            channel.queueBind(queueName, SOURCE_EXCHANGE, SOURCE_TOPIC);
+            channel.queueBind(queueName, SOURCE_EXCHANGE, SOURCE_TOPIC_JSON);
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
@@ -78,6 +80,15 @@ public class JSONConsumer implements Runnable{
         newJson.put("anyo", year);
         newJson.put("asignaturas", asignaturas);
         newJson.put("nota-media", averageGrade);
+
+        File file = new File("NotasMiddleware" + File.separator + "ExpFinal_" + alumno + ".json");
+        //Genera un archivo del expediente del alumno en formato CSV
+        try (FileWriter writer = new FileWriter(file)) {
+            String studentData = newJson.toString(4);
+            writer.write(studentData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return newJson;
     }

@@ -4,22 +4,25 @@ import com.rabbitmq.client.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
+import static iap.group1.NotasMiddleware.*;
+
 public class CSVConsumer implements Runnable {
 
-    private static final String SOURCE_EXCHANGE = "primer-exchange";
-    private static final String SOURCE_TOPIC = "generador.csv";
-    private static final String DESTINATION_EXCHANGE = "notas.alumnos.anyo";
+
+
 
     public void run() {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
-        factory.setPort(5672);
-        factory.setUsername("guest");
-        factory.setPassword("guest");
+        factory.setHost(HOST);
+        factory.setPort(PORT);
+        factory.setUsername(USERNAME);
+        factory.setPassword(PASSWORD);
         System.out.println("CSVConsumer running");
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
@@ -28,7 +31,7 @@ public class CSVConsumer implements Runnable {
             channel.exchangeDeclare(DESTINATION_EXCHANGE, BuiltinExchangeType.FANOUT);
 
             String queueName = channel.queueDeclare().getQueue();
-            channel.queueBind(queueName, SOURCE_EXCHANGE, SOURCE_TOPIC);
+            channel.queueBind(queueName, SOURCE_EXCHANGE, SOURCE_TOPIC_CSV);
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
@@ -37,6 +40,9 @@ public class CSVConsumer implements Runnable {
 
                 // Publicar el nuevo JSON en el exchange de destino
                 String newMessage = transformCsvToCanonical(message).toString();
+
+
+
                 channel.basicPublish(DESTINATION_EXCHANGE, "", null, newMessage.getBytes(StandardCharsets.UTF_8));
                 System.out.println("Published message to " + DESTINATION_EXCHANGE);
             };
@@ -96,6 +102,16 @@ public class CSVConsumer implements Runnable {
         newJson.put("anyo", year);
         newJson.put("asignaturas", asignaturas);
         newJson.put("nota-media", averageGrade);
+
+        File file = new File("NotasMiddleware" + File.separator + "ExpFinal_" + dni + ".json");
+        //Genera un archivo del expediente del alumno en formato CSV
+        try (FileWriter writer = new FileWriter(file)) {
+            String studentData = newJson.toString(4);
+            writer.write(studentData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         return newJson;
 
     }
