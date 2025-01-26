@@ -32,6 +32,16 @@ public class GeneradorExpedienteJSON {
     private static final String TOPIC = "generador.json";
 
     public static void main(String[] args) throws IOException, TimeoutException, JSONException {
+
+        System.out.println("   _____            ______                 _  _____  ____  _   _ \n" +
+                   "  / ____|          |  ____|               | |/ ____|/ __ \\| \\ | |\n" +
+                   " | |  __  ___ _ __ | |__  __  ___ __      | | (___ | |  | |  \\| |\n" +
+                   " | | |_ |/ _ \\ '_ \\|  __| \\ \\/ / '_ \\ _   | |\\___ \\| |  | | . ` |\n" +
+                   " | |__| |  __/ | | | |____ >  <| |_) | |__| |____) | |__| | |\\  |\n" +
+                   "  \\_____|\\___|_| |_|______/_/\\_\\ .__/ \\____/|_____/ \\____/|_| \\_|\n" +
+                   "                               | |                               \n" +
+                   "                               |_|                               ");
+
         String id = "Producer-" + UUID.randomUUID();
         try (Connection connection = createConnection();
              Channel channel = createChannel(connection);
@@ -42,7 +52,7 @@ public class GeneradorExpedienteJSON {
 
             String message;
             do {
-                System.out.print("Enter the alumn's DNI number or write exit to finish the program:");
+                System.out.print("[?] Enter the student's DNI or 'exit' to finish:");
                 message = scanner.nextLine();
                 if (!message.equalsIgnoreCase("exit")) {
                     processStudentData(channel, scanner, message);
@@ -72,17 +82,20 @@ public class GeneradorExpedienteJSON {
     }
 
     private static void processStudentData(Channel channel, Scanner scanner, String dni) throws IOException, JSONException {
-        System.out.print("Enter age: ");
+        System.out.print("[?] Enter year: ");
         int year = Integer.parseInt(scanner.nextLine());
-        File jsonFile = new File("Expediente_" + dni + ".json");
+//        File jsonFile = new File("generadores" + File.separator + "Expediente_" + dni + ".json");
+//        jsonFile.getParentFile().mkdirs();
+//
+//        try (FileWriter writer = new FileWriter(jsonFile)) {
+//            JSONObject studentData = fetchStudentData(dni, year);
+//            writer.write(studentData.toString(4)); // Indentación de 4 espacios
+//        }
+//
+//        byte[] content = Files.readAllBytes(jsonFile.toPath());
 
-        try (FileWriter writer = new FileWriter(jsonFile)) {
-            JSONObject studentData = fetchStudentData(dni, year);
-            writer.write(studentData.toString(4)); // Indentación de 4 espacios
-        }
-
-        byte[] content = Files.readAllBytes(jsonFile.toPath());
-        channel.basicPublish(NOMBRE_EXCHANGE, TOPIC, null, content);
+        JSONObject studentData = fetchStudentData(dni, year);
+        channel.basicPublish(NOMBRE_EXCHANGE, TOPIC, null, studentData.toString().getBytes());
     }
 
     private static JSONObject fetchStudentData(String dni, int year) throws JSONException {

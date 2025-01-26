@@ -19,6 +19,7 @@ import dao.AlumnoDAO;
 import dao.DAOFactory;
 import domain.Alumno;
 import domain.AlumnoAsignatura;
+import org.json.JSONObject;
 
 public class GeneradorExpedienteCSV {
     private static final String RABBITMQ_BROKER = "localhost";
@@ -26,6 +27,16 @@ public class GeneradorExpedienteCSV {
     private static final String TOPIC = "generador.csv";
 
     public static void main(String[] args) throws IOException, TimeoutException {
+
+        System.out.println("   _____            ______             _____  _______      __\n" +
+                "  / ____|          |  ____|           / ____|/ ____\\ \\    / /\n" +
+                " | |  __  ___ _ __ | |__  __  ___ __ | |    | (___  \\ \\  / / \n" +
+                " | | |_ |/ _ \\ '_ \\|  __| \\ \\/ / '_ \\| |     \\___ \\  \\ \\/ /  \n" +
+                " | |__| |  __/ | | | |____ >  <| |_) | |____ ____) |  \\  /   \n" +
+                "  \\_____|\\___|_| |_|______/_/\\_\\ .__/ \\_____|_____/    \\/    \n" +
+                "                               | |                           \n" +
+                "                               |_|                           ");
+
         String id = "Producer-" + UUID.randomUUID();
         try (Connection connection = createConnection();
              Channel channel = createChannel(connection);
@@ -36,7 +47,7 @@ public class GeneradorExpedienteCSV {
 
             String message;
             do {
-                System.out.print("Enter the student's DNI number or write 'exit' to finish:");
+                System.out.print("[?] Enter the student's DNI or 'exit' to finish:");
                 message = scanner.nextLine();
                 if (!message.equalsIgnoreCase("exit")) {
                     processStudentData(channel, scanner, message);
@@ -66,17 +77,20 @@ public class GeneradorExpedienteCSV {
     }
 
     private static void processStudentData(Channel channel, Scanner scanner, String dni) throws IOException {
-        System.out.print("Enter year: ");
+        System.out.print("[?] Enter year: ");
         int year = Integer.parseInt(scanner.nextLine());
-        File csvFile = new File("generadores" + File.separator + "Expediente_" + dni + ".csv");
-        //Genera un archivo del expediente del alumno en formato CSV
-        try (FileWriter writer = new FileWriter(csvFile)) {
-            String studentData = fetchStudentData(dni, year);
-            writer.write(studentData);
-        }
+//        File csvFile = new File("generadores" + File.separator + "Expediente_" + dni + ".csv");
+//        csvFile.getParentFile().mkdirs();
+//        //Genera un archivo del expediente del alumno en formato CSV
+//        try (FileWriter writer = new FileWriter(csvFile)) {
+//            String studentData = fetchStudentData(dni, year);
+//            writer.write(studentData);
+//}
+//
+//        byte[] content = Files.readAllBytes(csvFile.toPath());
+        String studentData = fetchStudentData(dni, year);
+        channel.basicPublish(NOMBRE_EXCHANGE, TOPIC, null, studentData.getBytes());
 
-        byte[] content = Files.readAllBytes(csvFile.toPath());
-        channel.basicPublish(NOMBRE_EXCHANGE, TOPIC, null, content);
     }
 
     private static String fetchStudentData(String dni, int year) {

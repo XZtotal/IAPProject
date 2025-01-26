@@ -22,6 +22,7 @@ public class JSONConsumer implements Runnable{
         factory.setPort(PORT);
         factory.setUsername(USERNAME);
         factory.setPassword(PASSWORD);
+
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
 
@@ -33,7 +34,7 @@ public class JSONConsumer implements Runnable{
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                System.out.println("Received message: " + message);
+                System.out.println("[JSONConsumer] Received message: " + message);
 
                 // Procesa el JSON recibido
                 JSONObject receivedJson = new JSONObject(message);
@@ -42,8 +43,9 @@ public class JSONConsumer implements Runnable{
                 // Publicar el nuevo JSON en el exchange de destino
                 String newMessage = responseJson.toString();
                 channel.basicPublish(DESTINATION_EXCHANGE, "", null, newMessage.getBytes(StandardCharsets.UTF_8));
-                System.out.println("Published message to " + DESTINATION_EXCHANGE);
+                System.out.println("[JSONConsumer] Published message to " + DESTINATION_EXCHANGE);
             };
+            System.out.println("[JSONConsumer] running");
 
             channel.basicConsume(queueName, true, deliverCallback, consumerTag -> { });
 
@@ -81,14 +83,17 @@ public class JSONConsumer implements Runnable{
         newJson.put("asignaturas", asignaturas);
         newJson.put("nota-media", averageGrade);
 
-        File file = new File("NotasMiddleware" + File.separator + "ExpFinal_" + alumno + ".json");
-        //Genera un archivo del expediente del alumno en formato CSV
-        try (FileWriter writer = new FileWriter(file)) {
-            String studentData = newJson.toString(4);
-            writer.write(studentData);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        File file = new File("NotasMiddleware" + File.separator + "ExpFinal_" + alumno + ".json");
+//        file.getParentFile().mkdirs();
+//        //Genera un archivo del expediente del alumno en formato CSV
+//        try (FileWriter writer = new FileWriter(file)) {
+//            String studentData = newJson.toString(4);
+//            writer.write(studentData);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        System.out.println("[JSONConsumer] Transformed JSON to JSON: \n" + newJson.toString(4));
 
         return newJson;
     }

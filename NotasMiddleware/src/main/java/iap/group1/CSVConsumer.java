@@ -23,7 +23,6 @@ public class CSVConsumer implements Runnable {
         factory.setPort(PORT);
         factory.setUsername(USERNAME);
         factory.setPassword(PASSWORD);
-        System.out.println("CSVConsumer running");
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
 
@@ -35,7 +34,8 @@ public class CSVConsumer implements Runnable {
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                System.out.println("Received message: " + message);
+                System.out.println("[CSVConsumer] Received message: " + message);
+
 
 
                 // Publicar el nuevo JSON en el exchange de destino
@@ -44,11 +44,12 @@ public class CSVConsumer implements Runnable {
 
 
                 channel.basicPublish(DESTINATION_EXCHANGE, "", null, newMessage.getBytes(StandardCharsets.UTF_8));
-                System.out.println("Published message to " + DESTINATION_EXCHANGE);
+                System.out.println("[CSVConsumer] Published message to " + DESTINATION_EXCHANGE);
             };
 
             try {
-                System.out.println("CSVConsumer running");
+                System.out.println("[CSVConsumer] running");
+
 
                 channel.basicConsume(queueName, true, deliverCallback, consumerTag -> { });
                 // Keep the thread alive to keep consuming messages
@@ -103,14 +104,18 @@ public class CSVConsumer implements Runnable {
         newJson.put("asignaturas", asignaturas);
         newJson.put("nota-media", averageGrade);
 
-        File file = new File("NotasMiddleware" + File.separator + "ExpFinal_" + dni + ".json");
-        //Genera un archivo del expediente del alumno en formato CSV
-        try (FileWriter writer = new FileWriter(file)) {
-            String studentData = newJson.toString(4);
-            writer.write(studentData);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        File file = new File("NotasMiddleware" + File.separator + "ExpFinal_" + dni + ".json");
+//        file.getParentFile().mkdirs();
+//
+//        //Genera un archivo del expediente del alumno en formato CSV
+//        try (FileWriter writer = new FileWriter(file)) {
+//            String studentData = newJson.toString(4);
+//            writer.write(studentData);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        System.out.println("[CSVConsumer] Transformed CSV to JSON: \n" + newJson.toString(4));
 
         return newJson;
 

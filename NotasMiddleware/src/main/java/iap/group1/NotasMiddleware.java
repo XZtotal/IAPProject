@@ -24,12 +24,14 @@ public class NotasMiddleware {
                 " |_| \\_|\\___/ \\__\\__,_|___/_|  |_|_|\\__,_|\\__,_|_|\\___| \\_/\\_/ \\__,_|_|  \\___|\n" +
                 "                                                                              \n" +
                 "                                                                              \n");
-
+        System.out.println("[+] Starting NotasMiddleware");
         Thread csvConsumerThread = new Thread(new CSVConsumer());
         Thread jsonConsumerThread = new Thread(new JSONConsumer());
 
         csvConsumerThread.start();
+        System.out.println("[+] CSVConsumer started");
         jsonConsumerThread.start();
+        System.out.println("[+] JSONConsumer started");
 
         try {
             csvConsumerThread.join();
