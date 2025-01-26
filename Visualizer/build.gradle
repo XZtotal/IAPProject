@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+
 }
 
 group = 'iap.group1'
@@ -19,4 +21,12 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+shadowJar {
+    archiveBaseName = 'Visualizer'
+    archiveVersion = '1.0.0'
+    manifest {
+        attributes 'Main-Class': 'iap.group1.Visualizer'
+    }
 }

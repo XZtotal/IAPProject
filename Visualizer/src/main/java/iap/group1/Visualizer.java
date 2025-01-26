@@ -3,16 +3,17 @@ package iap.group1;
 import com.rabbitmq.client.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeoutException;
 
-public class Main {
+public class Visualizer {
 
     private static final String QUEUE_NAME = "notas.alumno.anyo";
 
     public static void main(String[] args) {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
-        factory.setPort(15672);
+        factory.setPort(5672);
         factory.setUsername("guest");
         factory.setPassword("guest");
         try (Connection connection = factory.newConnection();
@@ -25,9 +26,16 @@ public class Main {
             };
             channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {});
 
+            // Keep the main thread alive
+            CountDownLatch latch = new CountDownLatch(1);
+            latch.await();
+
+
         } catch (IOException | TimeoutException e) {
             System.err.println("Error al conectar o procesar mensajes: " + e.getMessage());
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }
