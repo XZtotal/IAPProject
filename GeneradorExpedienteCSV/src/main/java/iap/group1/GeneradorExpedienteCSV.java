@@ -77,19 +77,27 @@ public class GeneradorExpedienteCSV {
     }
 
     private static void processStudentData(Channel channel, Scanner scanner, String dni) throws IOException {
-        System.out.print("[?] Enter year: ");
-        int year = Integer.parseInt(scanner.nextLine());
-//        File csvFile = new File("generadores" + File.separator + "Expediente_" + dni + ".csv");
-//        csvFile.getParentFile().mkdirs();
-//        //Genera un archivo del expediente del alumno en formato CSV
-//        try (FileWriter writer = new FileWriter(csvFile)) {
-//            String studentData = fetchStudentData(dni, year);
-//            writer.write(studentData);
-//}
-//
-//        byte[] content = Files.readAllBytes(csvFile.toPath());
-        String studentData = fetchStudentData(dni, year);
-        channel.basicPublish(NOMBRE_EXCHANGE, TOPIC, null, studentData.getBytes());
+        try {
+            System.out.print("[?] Enter year: ");
+            int year = Integer.parseInt(scanner.nextLine());
+    //        File csvFile = new File("generadores" + File.separator + "Expediente_" + dni + ".csv");
+    //        csvFile.getParentFile().mkdirs();
+    //        //Genera un archivo del expediente del alumno en formato CSV
+    //        try (FileWriter writer = new FileWriter(csvFile)) {
+    //            String studentData = fetchStudentData(dni, year);
+    //            writer.write(studentData);
+    //}
+    //
+    //        byte[] content = Files.readAllBytes(csvFile.toPath());
+            String studentData = fetchStudentData(dni, year);
+            channel.basicPublish(NOMBRE_EXCHANGE, TOPIC, null, studentData.getBytes());
+
+        }catch (NumberFormatException e) {
+            System.err.println("[!] Error: Invalid year format. Please enter a valid number.");
+        } catch (Exception e) {
+            System.err.println("[!] Error: " + e.getMessage());
+            e.printStackTrace();
+        }
 
     }
 

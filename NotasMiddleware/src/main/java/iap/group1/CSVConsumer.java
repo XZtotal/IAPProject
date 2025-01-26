@@ -91,7 +91,10 @@ public class CSVConsumer implements Runnable {
             asignatura.put("nota", nota);
             asignaturas.put(asignatura);
         }
-        double averageGrade = totalGrades / numAsignaturas;
+        double averageGrade = 0;
+        if (numAsignaturas > 0) {
+            averageGrade = totalGrades / numAsignaturas;
+        }
 
         // Crea el nuevo JSON respuesta
         JSONObject newJson = new JSONObject();

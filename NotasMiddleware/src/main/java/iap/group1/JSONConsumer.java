@@ -71,10 +71,13 @@ public class JSONConsumer implements Runnable{
 
         //Calcula media de las notas
         double totalGrades = 0;
-        for (int i = 0; i < asignaturas.length(); i++) {
-            totalGrades += asignaturas.getJSONObject(i).getDouble("nota");
+        double averageGrade = 0;
+        if (asignaturas.length() > 0) {
+            for (int i = 0; i < asignaturas.length(); i++) {
+                totalGrades += asignaturas.getJSONObject(i).getDouble("nota");
+            }
+            averageGrade = totalGrades / asignaturas.length();
         }
-        double averageGrade = totalGrades / asignaturas.length();
 
         // crea el nuevo JSON respuesta
         JSONObject newJson = new JSONObject();

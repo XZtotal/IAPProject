@@ -82,20 +82,28 @@ public class GeneradorExpedienteJSON {
     }
 
     private static void processStudentData(Channel channel, Scanner scanner, String dni) throws IOException, JSONException {
-        System.out.print("[?] Enter year: ");
-        int year = Integer.parseInt(scanner.nextLine());
-//        File jsonFile = new File("generadores" + File.separator + "Expediente_" + dni + ".json");
-//        jsonFile.getParentFile().mkdirs();
-//
-//        try (FileWriter writer = new FileWriter(jsonFile)) {
-//            JSONObject studentData = fetchStudentData(dni, year);
-//            writer.write(studentData.toString(4)); // Indentación de 4 espacios
-//        }
-//
-//        byte[] content = Files.readAllBytes(jsonFile.toPath());
+        try {
+            System.out.print("[?] Enter year: ");
+            int year = Integer.parseInt(scanner.nextLine());
+    //        File jsonFile = new File("generadores" + File.separator + "Expediente_" + dni + ".json");
+    //        jsonFile.getParentFile().mkdirs();
+    //
+    //        try (FileWriter writer = new FileWriter(jsonFile)) {
+    //            JSONObject studentData = fetchStudentData(dni, year);
+    //            writer.write(studentData.toString(4)); // Indentación de 4 espacios
+    //        }
+    //
+    //        byte[] content = Files.readAllBytes(jsonFile.toPath());
 
-        JSONObject studentData = fetchStudentData(dni, year);
-        channel.basicPublish(NOMBRE_EXCHANGE, TOPIC, null, studentData.toString().getBytes());
+            JSONObject studentData = fetchStudentData(dni, year);
+            channel.basicPublish(NOMBRE_EXCHANGE, TOPIC, null, studentData.toString().getBytes());
+
+        } catch (NumberFormatException e) {
+            System.err.println("[!] Error: Invalid year format. Please enter a valid number.");
+        } catch (Exception e) {
+            System.err.println("[!] Error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private static JSONObject fetchStudentData(String dni, int year) throws JSONException {
